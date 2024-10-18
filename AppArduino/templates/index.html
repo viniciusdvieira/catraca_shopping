@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Estado das Vagas</title>
+    <!-- Meta tag viewport para responsividade -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Incluindo o Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .square {
+            width: 150px;
+            height: 150px;
+            margin: 20px;
+            border: 2px solid #000;
+            position: relative;
+            cursor: pointer;
+        }
+        .square .vaga-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: #fff;
+            text-align: center;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .nav-link{
+            color: black;
+        }
+        /* Cores das vagas */
+        .green {
+            background-color: green;
+        }
+        .red {
+            background-color: red;
+        }
+        .blue {
+            background-color: blue;
+        }
+        .grey {
+            background-color: grey;
+        }
+        /* Responsividade para as vagas */
+        @media (max-width: 576px) {
+            .square {
+                width: 100px;
+                height: 100px;
+                margin: 10px;
+            }
+            .square .vaga-label {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Sistema de Estacionamento</a>
+        <!-- Botão para dispositivos móveis -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Links da navbar -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <span class="navbar-text mr-3">Bem-vindo, {{ current_user.username }}!</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-secondary" href="{{ url_for('registrar_cartao') }}">Registrar Cartão RFID</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-secondary" href="{{ url_for('perdeu_cartao') }}">Perdeu o cartão?</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-secondary" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Bloco de mensagens -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mt-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Estado das Vagas</h1>
+        <div class="row justify-content-center">
+            <!-- Vaga 1 -->
+            <div class="col-6 col-sm-4 col-md-3 text-center">
+                <div class="square {{ vagas['vaga1']['color'] }}" onclick="toggleDropdown(event, 'vaga1')">
+                    <div class="vaga-label">Vaga 1</div>
+                    <div class="dropdown-menu" id="dropdown-vaga1">
+                        {% if vagas['vaga1']['status'] == 'livre' %}
+                            <button class="dropdown-item" onclick="reservarVaga('vaga1')">Reservar Vaga</button>
+                        {% elif vagas['vaga1']['status'] == 'reservada' %}
+                            <button class="dropdown-item" onclick="liberarVaga('vaga1')">Liberar Vaga</button>
+                        {% else %}
+                            <button class="dropdown-item" disabled>Vaga Ocupada</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Vaga 2 -->
+            <div class="col-6 col-sm-4 col-md-3 text-center">
+                <div class="square {{ vagas['vaga2']['color'] }}" onclick="toggleDropdown(event, 'vaga2')">
+                    <div class="vaga-label">Vaga 2</div>
+                    <div class="dropdown-menu" id="dropdown-vaga2">
+                        {% if vagas['vaga2']['status'] == 'livre' %}
+                            <button class="dropdown-item" onclick="reservarVaga('vaga2')">Reservar Vaga</button>
+                        {% elif vagas['vaga2']['status'] == 'reservada' %}
+                            <button class="dropdown-item" onclick="liberarVaga('vaga2')">Liberar Vaga</button>
+                        {% else %}
+                            <button class="dropdown-item" disabled>Vaga Ocupada</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Você pode adicionar mais vagas seguindo o mesmo padrão -->
+        </div>
+    </div>
+
+    <!-- Incluindo o Bootstrap JS e dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleDropdown(event, vagaId) {
+            event.stopPropagation(); // Impede que o clique se propague
+            closeAllDropdowns(); // Fecha outros dropdowns abertos
+            var dropdown = $('#dropdown-' + vagaId);
+            dropdown.toggleClass('show');
+        }
+
+        function closeAllDropdowns() {
+            $('.dropdown-menu').removeClass('show');
+        }
+
+        $(document).click(function(event) {
+            if (!$(event.target).closest('.square').length) {
+                closeAllDropdowns();
+            }
+        });
+
+        function reservarVaga(vagaId) {
+            fetch('/reservar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'vaga_id': vagaId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    // Recarrega a página para atualizar o estado
+                    window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.error('Erro:', error);
+            });
+        }
+
+        function liberarVaga(vagaId) {
+            fetch('/liberar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'vaga_id': vagaId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    // Recarrega a página para atualizar o estado
+                    window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.error('Erro:', error);
+            });
+        }
+    </script>
+</body>
+</html>

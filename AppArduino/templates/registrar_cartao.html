@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Cartão RFID</title>
+    <!-- Meta tag viewport para responsividade -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Incluindo o Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Sistema de Estacionamento</a>
+        
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <span class="navbar-text mr-3">Bem-vindo, {{ current_user.username }}!</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-secondary" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Bloco de mensagens -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mt-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header text-center bg-info text-white">
+                        <h3>Registrar Cartão RFID</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="form-group">
+                                <label for="rfid_uid">Selecione o seu cartão RFID</label>
+                                <select class="form-control" name="rfid_uid" required>
+                                    <option value="530C7A29">Cartão 1</option>
+                                    <option value="53AA3F10">Cartão 2</option>
+                                    <option value="3DBDB85F">Tag 1</option>
+                                    <option value="3DBDB85F">Tag 2</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-info btn-block">Registrar Cartão</button>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="{{ url_for('index') }}">Voltar para a Página Inicial</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incluindo o Bootstrap JS e dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
