@@ -12,9 +12,7 @@ from flask_login import (
 
 app = Flask(__name__)
 
-# Configura novos delimitadores para evitar conflito (opcional)
-# app.jinja_env.variable_start_string = '[[ '
-# app.jinja_env.variable_end_string = ' ]]'
+
 
 # Configurações do banco de dados
 app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'  # Substitua por uma chave secreta real
@@ -26,13 +24,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Substitua pelo endereço IP real do seu Arduino
 ARDUINO_IP = 'http://192.168.3.138'
 
 # Estado inicial das vagas
 vagas = {
     'vaga1': {
-        'status': 'livre',  # Pode ser 'livre', 'ocupada' ou 'reservada'
+        'status': 'livre',  
         'color': 'green'
     },
     'vaga2': {
